@@ -100,12 +100,10 @@ resource "aws_lb" "web_lb" {
 
 # 8. Target Group
 resource "aws_lb_target_group" "web_tg" {
-  name     = "web-tg-final-deployment" # Changed this from 'web-tg'
+  name     = "web-tg-final-deployment"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.main.id
-  # ... keep the rest of your health_check configuration
-}
 
   health_check {
     path                = "/"
