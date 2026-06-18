@@ -4,33 +4,53 @@ provider "aws" {
 
 # 1. VPC
 resource "aws_vpc" "main" {
-  cidr_block = var.vpc_cidr
+  cidr_block           = var.vpc_cidr
+  enable_dns_hostnames = true # Required for public instances
+  enable_dns_support   = true
 }
 
-data "aws_ami" "amazon_linux_2023" {
-  most_recent = true
-  owners      = ["amazon"]
+# 2. Internet Gateway
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
+}
 
-  filter {
-    name   = "name"
-    values = ["al2023-ami-2023.*-x86_64"]
+# 3. Public Route Table
+resource "aws_route_table" "public_rt" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
   }
 }
 
-# 2. Public Subnet (For the Load Balancer)
+# 4. Subnets
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
 }
 
-# 3. Private Subnet (For the EC2 Instances)
-resource "aws_subnet" "private" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24"
+resource "aws_subnet" "public_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.3.0/24"
+  availability_zone       = "us-east-1b"
+  map_public_ip_on_launch = true
 }
 
-# 4. Security Group for the Load Balancer (Allows internet traffic on 80)
+# 5. Route Table Associations
+resource "aws_route_table_association" "public_1_assoc" {
+  subnet_id      = aws_subnet.public.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
+resource "aws_route_table_association" "public_2_assoc" {
+  subnet_id      = aws_subnet.public_2.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
+# 6. Security Groups
 resource "aws_security_group" "lb_sg" {
   name   = "lb-sg"
   vpc_id = aws_vpc.main.id
@@ -50,7 +70,6 @@ resource "aws_security_group" "lb_sg" {
   }
 }
 
-# 5. Security Group for the Instances (Allows traffic ONLY from the LB)
 resource "aws_security_group" "instance_sg" {
   name   = "instance-sg"
   vpc_id = aws_vpc.main.id
@@ -70,25 +89,16 @@ resource "aws_security_group" "instance_sg" {
   }
 }
 
-# 2b. Second Public Subnet (For the Load Balancer - different AZ)
-resource "aws_subnet" "public_2" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.3.0/24" # Different CIDR
-  availability_zone       = "us-east-1b"  # Different AZ than the first one
-  map_public_ip_on_launch = true
-}
-
-# 6. Load Balancer
+# 7. Load Balancer
 resource "aws_lb" "web_lb" {
   name               = "web-lb"
   internal           = false
   load_balancer_type = "application"
-  # Use both subnets here:
-  subnets            = [aws_subnet.public.id, aws_subnet.public_2.id] 
+  subnets            = [aws_subnet.public.id, aws_subnet.public_2.id]
   security_groups    = [aws_security_group.lb_sg.id]
 }
 
-# 7. Target Group (With Health Check)
+# 8. Target Group
 resource "aws_lb_target_group" "web_tg" {
   name     = "web-tg"
   port     = 80
@@ -97,7 +107,6 @@ resource "aws_lb_target_group" "web_tg" {
 
   health_check {
     path                = "/"
-    port                = "traffic-port"
     protocol            = "HTTP"
     healthy_threshold   = 2
     unhealthy_threshold = 2
@@ -106,7 +115,7 @@ resource "aws_lb_target_group" "web_tg" {
   }
 }
 
-# 8. ALB Listener
+# 9. ALB Listener
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.web_lb.arn
   port              = 80
@@ -118,7 +127,17 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
-# 9. Launch Template (With User Data)
+# 10. Data Source for AMI
+data "aws_ami" "amazon_linux_2023" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023.*-x86_64"]
+  }
+}
+
+# 11. Launch Template
 resource "aws_launch_template" "app_template" {
   name_prefix            = "app-server-"
   image_id               = data.aws_ami.amazon_linux_2023.id
@@ -136,7 +155,7 @@ resource "aws_launch_template" "app_template" {
   )
 }
 
-# 10. Auto Scaling Group
+# 12. Auto Scaling Group
 resource "aws_autoscaling_group" "web_asg" {
   vpc_zone_identifier = [aws_subnet.public.id, aws_subnet.public_2.id]
   min_size            = 1
@@ -149,7 +168,7 @@ resource "aws_autoscaling_group" "web_asg" {
   }
 }
 
-# 11. Attach ASG to the Target Group
+# 13. Attachment
 resource "aws_autoscaling_attachment" "asg_attachment" {
   autoscaling_group_name = aws_autoscaling_group.web_asg.id
   lb_target_group_arn    = aws_lb_target_group.web_tg.arn
