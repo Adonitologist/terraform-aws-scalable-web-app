@@ -15,11 +15,17 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
+    # This step fixes the "exit code 127" error
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v4
+      with:
+        terraform_version: "1.9.0"
+
     - name: Download State Artifact
       uses: actions/download-artifact@v4
       with:
         name: terraform-state
-      continue-on-error: true # Continues even if no state exists
+      continue-on-error: true
 
     - name: Terraform Init
       run: terraform init

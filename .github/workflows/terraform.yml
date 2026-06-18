@@ -1,6 +1,7 @@
 name: 'Terraform Ephemeral Deployment'
 on:
   workflow_dispatch:
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -14,6 +15,12 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
+
+    # This step fixes the "exit code 127" error
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v4
+      with:
+        terraform_version: "1.9.0"
 
     - name: Terraform Init
       run: terraform init
