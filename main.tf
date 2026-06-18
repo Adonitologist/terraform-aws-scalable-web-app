@@ -70,12 +70,21 @@ resource "aws_security_group" "instance_sg" {
   }
 }
 
+# 2b. Second Public Subnet (For the Load Balancer - different AZ)
+resource "aws_subnet" "public_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.3.0/24" # Different CIDR
+  availability_zone       = "us-east-1b"  # Different AZ than the first one
+  map_public_ip_on_launch = true
+}
+
 # 6. Load Balancer
 resource "aws_lb" "web_lb" {
   name               = "web-lb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = [aws_subnet.public.id]
+  # Use both subnets here:
+  subnets            = [aws_subnet.public.id, aws_subnet.public_2.id] 
   security_groups    = [aws_security_group.lb_sg.id]
 }
 
@@ -129,7 +138,7 @@ resource "aws_launch_template" "app_template" {
 
 # 10. Auto Scaling Group
 resource "aws_autoscaling_group" "web_asg" {
-  vpc_zone_identifier = [aws_subnet.private.id]
+  vpc_zone_identifier = [aws_subnet.public.id, aws_subnet.public_2.id]
   min_size            = 1
   max_size            = 3
   desired_capacity    = 2
