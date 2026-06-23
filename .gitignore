@@ -1,4 +1,14 @@
+# Local state files
+*.tfstate
+*.tfstate.backup
+
+# Terraform configuration/lock files
 .terraform/
-terraform.tfstate
-terraform.tfstate.backup
+.terraform.lock.hcl
+.terraform.tfstate.lock.info
+
+# Plan files
+tfplan
+
+# Variables
 *.tfvars

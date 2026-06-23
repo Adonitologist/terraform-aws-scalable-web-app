@@ -7,6 +7,10 @@ resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true # Required for public instances
   enable_dns_support   = true
+
+  tags = {
+    Environment = "Testing"
+  }
 }
 
 # 2. Internet Gateway
@@ -100,7 +104,7 @@ resource "aws_lb" "web_lb" {
 
 # 8. Target Group
 resource "aws_lb_target_group" "web_tg" {
-  name     = "web-tg-final-deployment"
+  name     = "web-tg"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.main.id
