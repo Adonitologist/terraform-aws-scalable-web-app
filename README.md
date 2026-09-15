@@ -9,34 +9,38 @@ Production-ready scalable web application hosted on AWS. Built using modular Inf
 
 ## System Architecture
 
-mermaid
+```mermaid
 flowchart TD
-Client([User Browser]) -->|HTTP / Port 80| ALB[Application Load Balancer\nPublic Subnets]
-ALB -->|Forward Traffic| ASG[Auto Scaling Group\nPrivate Subnets]
-subgraph VPC [AWS Virtual Private Cloud 10.0.0.0/16]
-subgraph Public Tier
-ALB
-IGW[Internet Gateway]
-NAT[NAT Gateway]
-end
-subgraph Private Tier
-ASG
-end
-end
-ASG -->|Outbound Updates via NAT| NAT
-NAT -->|Route to Internet| IGW
+    Client([User Browser]) -->|HTTP / Port 80| ALB[Application Load Balancer\nPublic Subnets]
+    ALB -->|Forward Traffic| ASG[Auto Scaling Group\nPrivate Subnets]
+    subgraph VPC [AWS Virtual Private Cloud 10.0.0.0/16]
+        subgraph Public Tier
+            ALB
+            IGW[Internet Gateway]
+            NAT[NAT Gateway]
+        end
+        subgraph Private Tier
+            ASG
+        end
+    end
+    ASG -->|Outbound Updates via NAT| NAT
+    NAT -->|Route to Internet| IGW
 
+```
 
-## Core Technical Highlights
+Core Technical Highlights
 
-* **Strict Network Isolation:** Compute workloads (EC2 instances managed by an Auto Scaling Group) reside entirely in private subnets without public IPs.
-* **High Availability & Load Balancing:** Traffic enters via an Application Load Balancer deployed across multi-AZ public subnets, distributing requests securely to private instances.
-* **Outbound NAT Routing:** Private instances leverage a NAT Gateway attached to an Elastic IP in the public tier to safely download packages and updates.
-* **Automated Quality Gates:** Integrated GitHub Actions workflow running `terraform fmt`, `tflint` static analysis, and `tfsec` security scans on every push.
+    Strict Network Isolation: Compute workloads (EC2 instances managed by an Auto Scaling Group) reside entirely in private subnets without public IPs.
 
-## Repository Structure
+    High Availability & Load Balancing: Traffic enters via an Application Load Balancer deployed across multi-AZ public subnets, distributing requests securely to private instances.
 
-text
+    Outbound NAT Routing: Private instances leverage a NAT Gateway attached to an Elastic IP in the public tier to safely download packages and updates.
+
+    Automated Quality Gates: Integrated GitHub Actions workflow running terraform fmt, tflint static analysis, and tfsec security scans on every push.
+
+Repository Structure
+```text
+
 .
 ├── .github/workflows/
 │   └── ci.yml                # Terraform Validation & Security Pipeline
@@ -48,26 +52,36 @@ text
 ├── outputs.tf                # Infrastructure Outputs (ALB DNS)
 └── backend.tf                # S3 Remote State Backend Configuration
 
+Prerequisites & Setup
 
-## Execution Commands
+    AWS CLI configured with appropriate permissions.
 
-1. Initialize remote S3 backend:
+    Terraform version >= 1.5.0.
 
-bash
-terraform init
+    An existing S3 bucket for the remote backend (update backend.tf accordingly).
 
-2. Validate infrastructure syntax:
+Execution Commands
 
-bash
-terraform validate
+    Initialize remote S3 backend:
+    Bash
 
-3. Deploy infrastructure:
+    terraform init
 
-bash
-terraform apply
+    Validate infrastructure syntax:
+    Bash
 
-4. Destroy infrastructure (Zero-Cost Baseline):
+    terraform validate
 
-bash
-terraform destroy
+    Deploy infrastructure:
+    Bash
 
+    terraform apply
+
+    Destroy infrastructure (Zero-Cost Baseline):
+    Bash
+
+    terraform destroy
+
+Cost Management Notice
+
+    Zero-Cost Policy: This architecture provisions a NAT Gateway which incurs continuous hourly charges if left running. Always execute terraform destroy immediately after verification sessions.
