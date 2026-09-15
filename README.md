@@ -52,6 +52,8 @@ Repository Structure
 ├── outputs.tf                # Infrastructure Outputs (ALB DNS)
 └── backend.tf                # S3 Remote State Backend Configuration
 
+```
+
 Prerequisites & Setup
 
     AWS CLI configured with appropriate permissions.
