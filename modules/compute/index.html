@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scalable Web App - Portfolio</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; }
+        .github-btn { position: absolute; top: 20px; left: 20px; background: #24292e; color: #fff; padding: 10px 15px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background 0.2s; }
+        .github-btn:hover { background: #444d56; }
+        header { background: #ffffff; width: 100%; padding: 40px 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-top: 40px; }
+        h1 { color: #1a202c; font-size: 2.5rem; margin-bottom: 10px; }
+        .subtitle { color: #4a5568; font-size: 1.1rem; }
+        .container { max-width: 800px; width: 90%; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin: 30px 0; }
+        h2 { color: #2b6cb0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 0; }
+        .cv-section { margin-bottom: 20px; }
+        .cv-item { margin-bottom: 15px; }
+        .cv-item h3 { margin: 0 0 5px 0; font-size: 1.1rem; color: #2d3748; }
+        .cv-item p { margin: 0; color: #718096; font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/Adonitologist" target="_blank" class="github-btn">
+        <svg height="20" width="20" viewBox="0 0 16 16" fill="white"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.22 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+        GitHub Profile
+    </a>
+    <header>
+        <h1>Scalable Web App Architecture</h1>
+        <p class="subtitle">Enterprise-grade Infrastructure deployed via Terraform & AWS Auto Scaling</p>
+    </header>
+    <div class="container">
+        <h2>Perfil Profesional & Curriculum</h2>
+        <div class="cv-section">
+            <div class="cv-item">
+                <h3>Ingeniería & Automatización de Sistemas</h3>
+                <p>Especialista en desarrollo de arquitecturas cloud robustas, infraestructura como código (IaC) e integración continua.</p>
+            </div>
+            <div class="cv-item">
+                <h3>Proyectos Destacados en el Portafolio</h3>
+                <p>• <strong>AWS Cloud Resume Challenge:</strong> Servidorless con S3 OAC, CloudFront, Lambda y DynamoDB.<br>
+                • <strong>MasQVida Automator:</strong> Automatización OOP con Selenium y gestión de esperas explícitas.<br>
+                • <strong>Scalable Web App:</strong> Arquitectura de red de 2 niveles con VPC pública/privada y NAT Gateway.</p>
+            </div>
+            <div class="cv-item">
+                <h3>Stack Tecnológico</h3>
+                <p>Terraform, AWS (VPC, EC2, ALB, ASG, S3, IAM), Python, Docker, GitHub Actions OIDC.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
